@@ -185,6 +185,12 @@ target_include_directories(vst3sdk PUBLIC
 
 target_no_warning(vst3sdk -w)
 
+if (CC_IS_MSVC)
+    # C++20 changed u8"" literals from const char* to const char8_t*, breaking
+    # VST SDK's module_win32.cpp which passes them to functions expecting std::string.
+    target_compile_options(vst3sdk PRIVATE /Zc:char8_t-)
+endif()
+
 if (CC_IS_CLANG)
     target_compile_options(vst3sdk PRIVATE -fobjc-arc)
 endif()
