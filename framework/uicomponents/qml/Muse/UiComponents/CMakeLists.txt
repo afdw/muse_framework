@@ -123,6 +123,7 @@ qt_add_qml_module(muse_uicomponents_qml
         NumberInputField.qml
         PageIndicator.qml
         PageTabButton.qml
+        PopupButton.qml
         PopupPanel.qml
         ProgressBar.qml
         ProgressButton.qml
@@ -143,6 +144,7 @@ qt_add_qml_module(muse_uicomponents_qml
         StyledListView.qml
         StyledMenuLoader.qml
         StyledPopupView.qml
+        StyledPopupLoader.qml
         StyledScrollBar.qml
         StyledSlider.qml
         StyledTabBar.qml
