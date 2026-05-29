@@ -27,5 +27,5 @@ Available platforms (space-separated):
 -->
 audacity: audacity/audacity/master
 audacity platforms: linux_x64
-musescore: musescore/MuseScore/master
+musescore: musescore/MuseScore/main
 musescore platforms: linux_x64
