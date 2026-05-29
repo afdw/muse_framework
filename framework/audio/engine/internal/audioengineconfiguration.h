@@ -40,6 +40,9 @@ public:
     void setIsLazyProcessingOfOnlineSoundsEnabled(bool enabled) override;
     async::Channel<bool> isLazyProcessingOfOnlineSoundsEnabledChanged() const override;
 
+    bool useSoundFontLowPassFilter() const override;
+    async::Channel<bool> useSoundFontLowPassFilterChanged() const override;
+
     AudioInputParams defaultAudioInputParams() const override;
 
 private:
@@ -48,5 +51,6 @@ private:
 
     async::Channel<bool> m_autoProcessOnlineSoundsInBackgroundChanged;
     async::Channel<bool> m_isLazyProcessingOfOnlineSoundsEnabledChanged;
+    async::Channel<bool> m_useSoundFontLowPassFilterChanged;
 };
 }
