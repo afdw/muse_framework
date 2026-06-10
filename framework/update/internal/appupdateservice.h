@@ -32,6 +32,7 @@
 
 #include "network/inetworkmanagercreator.h"
 #include "update/iupdateconfiguration.h"
+#include "update/iupdaterequestparamsprovider.h"
 
 namespace muse::update {
 class AppUpdateService : public IAppUpdateService, public Contextable, public async::Asyncable
@@ -39,6 +40,7 @@ class AppUpdateService : public IAppUpdateService, public Contextable, public as
     GlobalInject<io::IFileSystem> fileSystem;
     GlobalInject<ISystemInfo> systemInfo;
     GlobalInject<IUpdateConfiguration> configuration;
+    GlobalInject<IUpdateRequestParamsProvider> requestParamsProvider;
     GlobalInject<network::INetworkManagerCreator> networkManagerCreator;
     GlobalInject<IApplication> application;
 

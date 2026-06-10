@@ -28,6 +28,7 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QUrlQuery>
 
 #include "update/updateerrors.h"
 
@@ -134,6 +135,17 @@ Promise<RetVal<ReleaseInfo> > AppUpdateService::checkForUpdate()
         }
 
         QUrl url = QString::fromStdString(configuration()->checkForAppUpdateUrl());
+        if (requestParamsProvider()) {
+            QUrlQuery query(url);
+            for (const auto& [key, value] : requestParamsProvider()->updateRequestParams()) {
+                query.addQueryItem(QString::fromStdString(key), QString::fromStdString(value));
+            }
+
+            if (!query.isEmpty()) {
+                url.setQuery(query);
+            }
+        }
+
         RequestHeaders headers = prepareHeaders(historyRv.val);
         auto buff = std::make_shared<QBuffer>();
 

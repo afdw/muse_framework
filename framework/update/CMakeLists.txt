@@ -26,6 +26,7 @@ target_sources(muse_update PRIVATE
     updatetypes.h
     updateerrors.h
     iupdateconfiguration.h
+    iupdaterequestparamsprovider.h
     iappupdatescenario.h
     iappupdateservice.h
 
