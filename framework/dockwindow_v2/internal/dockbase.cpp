@@ -756,6 +756,30 @@ void DockBase::applySizeConstraints()
     }
 }
 
+void DockBase::syncLayoutItemMinSize()
+{
+    if (!m_dockWidget) {
+        return;
+    }
+
+    KDDockWidgets::Core::Group* group = groupForDockWidget(m_dockWidget);
+    if (!group) {
+        return;
+    }
+
+    KDDockWidgets::Core::Item* item = group->layoutItem();
+    if (!item) {
+        return;
+    }
+
+    //! NOTE: The layouting item caches the guest minimum; force it to match the group's current
+    //! minimum so the container's minimum size reflects
+    const QSize min = group->view()->minSize();
+    if (item->minSize() != min) {
+        item->setMinSize(min);
+    }
+}
+
 void DockBase::setUpFrameConnections()
 {
     IF_ASSERT_FAILED(m_dockWidget) {

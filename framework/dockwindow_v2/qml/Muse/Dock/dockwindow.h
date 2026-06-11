@@ -138,6 +138,10 @@ private:
 
     void adjustContentForAvailableSpace(DockPageView* page);
 
+    void applyLayoutSizeToFitWindow();
+    void scheduleDeferredLayoutFix();
+    void runDeferredLayoutFix();
+
     void notifyAboutDocksOpenStatus();
 
     QList<DockToolBarView*> topLevelToolBars(const DockPageView* page) const;
@@ -153,5 +157,8 @@ private:
 
     bool m_hasGeometryBeenRestored = false;
     bool m_reloadCurrentPageAllowed = false;
+
+    bool m_layoutFixScheduled = false;
+    int m_pendingWidth = -1;
 };
 }

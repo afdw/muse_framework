@@ -22,10 +22,13 @@
 
 #include "dockwindow.h"
 
+#include <QTimer>
+
 #include "kddockwidgets/src/LayoutSaver.h"
 #include "kddockwidgets/src/Config.h"
 #include "kddockwidgets/src/core/DockRegistry.h"
 #include "kddockwidgets/src/core/Layout.h"
+#include "kddockwidgets/src/core/MainWindow.h"
 #include "kddockwidgets/src/qtquick/views/MainWindow.h"
 #include "kddockwidgets/src/qtquick/views/DockWidget.h"
 #include "kddockwidgets/src/qtquick/views/View.h"
@@ -50,6 +53,9 @@ using namespace muse::dock;
 using namespace muse::async;
 
 namespace muse::dock {
+//! NOTE: Toolbar's maximum lenght, see DockToolBar.qml
+static constexpr int UNCONSTRAINED_TOOLBAR_WIDTH = 16777215;
+
 static const QList<Location> POSSIBLE_LOCATIONS {
     Location::Left,
     Location::Right,
@@ -145,30 +151,94 @@ void DockWindow::componentComplete()
 
     connect(qApp, &QCoreApplication::aboutToQuit, this, &DockWindow::onQuit);
     connect(this, &QQuickItem::windowChanged, this, &DockWindow::windowPropertyChanged);
-
-    connect(this, &QQuickItem::widthChanged, this, [this]() {
-        adjustContentForAvailableSpace(m_currentPage);
-    });
 }
 
 void DockWindow::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
-    if (!m_currentPage) {
-        QQuickItem::geometryChange(newGeometry, oldGeometry);
-        return;
+    const bool widthChanged = m_currentPage && !qFuzzyCompare(newGeometry.width(), oldGeometry.width());
+    const bool shrinking = widthChanged && newGeometry.width() < oldGeometry.width();
+
+    if (shrinking) {
+        m_pendingWidth = int(newGeometry.width());
+
+        //! NOTE: Unpin the paddings first so compact mode can actually shrink the toolbars' content
+        for (DockToolBarView* toolBar : topLevelToolBars(m_currentPage)) {
+            toolBar->setMinimumWidth(toolBar->contentWidth());
+        }
+
+        adjustContentForAvailableSpace(m_currentPage);
+        alignTopLevelToolBars(m_currentPage);
+
+        //! NOTE: Apply the new size to the layout synchronously
+        applyLayoutSizeToFitWindow();
+
+        m_pendingWidth = -1;
+
+        //! NOTE: The synchronous resize above can be partial when KDDockWidgets' async item-size sync
+        //! hasn't settled yet. So let's shedule another layout
+        scheduleDeferredLayoutFix();
     }
 
     QQuickItem::geometryChange(newGeometry, oldGeometry);
 
-    //! NOTE: it is important to reset the current minimum width for all top-level toolbars
-    //! Otherwise, the window content can be displaced after LayoutWidget::onResize(QSize newSize)
-    //! due to lack of free space
-    const QList<DockToolBarView*> topToolBars = topLevelToolBars(m_currentPage);
-    for (DockToolBarView* toolBar : topToolBars) {
-        toolBar->setMinimumWidth(toolBar->contentWidth());
+    if (!widthChanged || shrinking) {
+        return;
     }
 
+    adjustContentForAvailableSpace(m_currentPage);
     alignTopLevelToolBars(m_currentPage);
+}
+
+void DockWindow::applyLayoutSizeToFitWindow()
+{
+    KDDockWidgets::Core::MainWindow* mw = m_mainWindow ? m_mainWindow->mainWindow() : nullptr;
+    KDDockWidgets::Core::Layout* layout = mw ? mw->layout() : nullptr;
+    if (!layout) {
+        return;
+    }
+
+    const int targetWidth = m_pendingWidth >= 0 ? m_pendingWidth : int(width());
+    const int layoutMin = layout->layoutMinimumSize().width();
+
+    const int applyWidth = std::max(targetWidth, layoutMin);
+
+    if (applyWidth != layout->layoutSize().width()) {
+        layout->setLayoutSize(QSize(applyWidth, layout->layoutSize().height()));
+    }
+}
+
+void DockWindow::scheduleDeferredLayoutFix()
+{
+    if (m_layoutFixScheduled) {
+        return;
+    }
+
+    m_layoutFixScheduled = true;
+
+    QTimer::singleShot(0, this, [this]() {
+        runDeferredLayoutFix();
+    });
+}
+
+void DockWindow::runDeferredLayoutFix()
+{
+    m_layoutFixScheduled = false;
+
+    if (!m_currentPage) {
+        return;
+    }
+
+    adjustContentForAvailableSpace(m_currentPage);
+    alignTopLevelToolBars(m_currentPage);
+
+    //! NOTE: Force the layouting items to pick up the current dock minimums
+    for (DockBase* dock : m_currentPage->allDocks()) {
+        if (dock) {
+            dock->syncLayoutItemMinSize();
+        }
+    }
+
+    applyLayoutSizeToFitWindow();
 }
 
 void DockWindow::onQuit()
@@ -424,16 +494,27 @@ void DockWindow::loadPanels(const DockPageView* page)
 
 void DockWindow::alignTopLevelToolBars(const DockPageView* page)
 {
-    QList<DockToolBarView*> topToolBars = topLevelToolBars(page);
+    const QList<DockToolBarView*> topToolBars = topLevelToolBars(page);
+
+    //! NOTE: Reset paddings/pins first, so that widths from a previous
+    //! configuration do not accumulate
+    for (DockToolBarView* toolBar : topToolBars) {
+        toolBar->setMaximumWidth(UNCONSTRAINED_TOOLBAR_WIDTH);
+        toolBar->setMinimumWidth(toolBar->contentWidth());
+    }
 
     DockToolBarView* lastLeftToolBar = nullptr;
     DockToolBarView* lastCentralToolBar = nullptr;
 
-    int leftToolBarsWidth = 0;
-    int centralToolBarsWidth = 0;
-    int rightToolBarsWidth = 0;
+    int leftBlockWidth = 0;
+    int centralBlockWidth = 0;
+    int rightBlockWidth = 0;
 
-    int separatorThickness = KDDockWidgets::Config::self(iocContext()->id).separatorThickness();
+    int leftCount = 0;
+    int centralCount = 0;
+    int rightCount = 0;
+
+    const int separator = KDDockWidgets::Config::self(iocContext()->id).separatorThickness();
 
     for (DockToolBarView* toolBar : topToolBars) {
         if (toolBar->floating() || !toolBar->isVisible()) {
@@ -443,39 +524,60 @@ void DockWindow::alignTopLevelToolBars(const DockPageView* page)
         switch (static_cast<DockToolBarAlignment::Type>(toolBar->alignment())) {
         case DockToolBarAlignment::Left:
             lastLeftToolBar = toolBar;
-            leftToolBarsWidth += toolBar->contentWidth();
+            leftBlockWidth += toolBar->contentWidth();
+            ++leftCount;
             break;
         case DockToolBarAlignment::Center:
             lastCentralToolBar = toolBar;
-            centralToolBarsWidth += (toolBar->contentWidth() + separatorThickness);
+            centralBlockWidth += toolBar->contentWidth();
+            ++centralCount;
             break;
         case DockToolBarAlignment::Right:
-            rightToolBarsWidth += (toolBar->contentWidth() + separatorThickness);
+            rightBlockWidth += toolBar->contentWidth();
+            ++rightCount;
             break;
         }
     }
 
-    if (!lastLeftToolBar || !lastCentralToolBar) {
+    leftBlockWidth += separator * std::max(0, leftCount - 1);
+    centralBlockWidth += separator * std::max(0, centralCount - 1);
+    rightBlockWidth += separator * std::max(0, rightCount - 1);
+
+    const int separatorLeftCentral = (leftCount > 0 && centralCount > 0) ? separator : 0;
+    const int separatorCentralRight = (centralCount > 0 && rightCount > 0) ? separator : 0;
+    const int separatorLeftRight = (leftCount > 0 && centralCount == 0 && rightCount > 0) ? separator : 0;
+
+    const int occupied = leftBlockWidth + centralBlockWidth + rightBlockWidth
+                         + separatorLeftCentral + separatorCentralRight + separatorLeftRight;
+
+    //! NOTE: During a resize the new width isn't propagated to width yet
+    const int availableWidth = m_pendingWidth >= 0 ? m_pendingWidth : int(width());
+
+    const int freeSpace = availableWidth - occupied;
+    if (freeSpace <= 0) {
         return;
     }
 
-    int deltaForLastLeftToolbar = (width() - centralToolBarsWidth) / 2 - leftToolBarsWidth;
-    int deltaForLastCentralToolBar = (width() - centralToolBarsWidth) / 2 - rightToolBarsWidth;
+    DockToolBarView* grower = lastLeftToolBar ? lastLeftToolBar : lastCentralToolBar;
 
-    deltaForLastLeftToolbar = std::max(deltaForLastLeftToolbar, 0);
-    deltaForLastCentralToolBar = std::max(deltaForLastCentralToolBar, 0);
-
-    int freeSpace = width() - (leftToolBarsWidth + centralToolBarsWidth + rightToolBarsWidth);
-
-    if (deltaForLastLeftToolbar + deltaForLastCentralToolBar > freeSpace) {
-        deltaForLastLeftToolbar = freeSpace;
-        deltaForLastCentralToolBar = 0;
+    int paddingForLastCentral = 0;
+    if (lastCentralToolBar && lastCentralToolBar != grower) {
+        paddingForLastCentral = (availableWidth - centralBlockWidth) / 2 - rightBlockWidth - separatorCentralRight;
+        paddingForLastCentral = std::min(std::max(paddingForLastCentral, 0), freeSpace);
     }
 
-    lastLeftToolBar->setMinimumWidth(lastLeftToolBar->contentWidth() + deltaForLastLeftToolbar);
+    for (DockToolBarView* toolBar : topToolBars) {
+        if (toolBar->floating() || !toolBar->isVisible() || toolBar == grower) {
+            continue;
+        }
 
-    if (freeSpace >= 0) {
-        lastCentralToolBar->setMinimumWidth(lastCentralToolBar->contentWidth() + deltaForLastCentralToolBar);
+        const int pinnedWidth = (toolBar == lastCentralToolBar)
+                                ? toolBar->contentWidth() + paddingForLastCentral
+                                : toolBar->contentWidth();
+
+        //! NOTE: max before min
+        toolBar->setMaximumWidth(pinnedWidth);
+        toolBar->setMinimumWidth(pinnedWidth);
     }
 }
 
@@ -786,7 +888,7 @@ void DockWindow::adjustContentForAvailableSpace(DockPageView* page)
         return;
     }
 
-    int spaceWidth = width();
+    int spaceWidth = m_pendingWidth >= 0 ? m_pendingWidth : int(width());
 
     auto adjustDocks = [&spaceWidth](QList<DockBase*> docks) {
         int width = 0;
