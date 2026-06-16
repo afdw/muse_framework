@@ -103,21 +103,11 @@ else()
         internal/fontfacedu.h
     )
 
-    include(cmake/SetupFreeType.cmake)
-    include(cmake/SetupHarfBuzz.cmake)
-
     target_compile_definitions(muse_draw PUBLIC MUSE_MODULE_DRAW_USE_QTTEXTDRAW)
 
     target_link_libraries(muse_draw PRIVATE
-        ${FREETYPE_LIBRARIES}
-        ${HARFBUZZ_LIBRARIES}
-        #msdfgen
-    )
-
-    target_include_directories(muse_draw PRIVATE
-        ${FREETYPE_INCLUDE_DIRS}
-        ${HARFBUZZ_INCLUDE_DIRS}
-        #${MSDFGEN_INCLUDE_DIRS}
+        freetype::freetype
+        harfbuzz::harfbuzz
     )
 
 endif()
