@@ -22,6 +22,7 @@
 #include "mcpserver.h"
 
 #include "global/stringutils.h"
+#include "global/serialization/json.h"
 
 #include "log.h"
 #include "thirdparty/kors_logger/src/log_base.h"
@@ -47,7 +48,7 @@ static std::string commandToToolName(const Command& command)
     return path;
 }
 
-static CommandQuery commandQuery(const std::string& name, const JsonObject& args)
+static CommandQuery commandQuery(const std::string& name, const muse::JsonObject& args)
 {
     UNUSED(args); // TODO: implement
     std::string path = name;
@@ -70,7 +71,7 @@ void McpController::init()
     });
 
     m_mcpServer->onToolsCallRequest([this](const std::string& name,
-                                           const JsonObject& args,
+                                           const muse::JsonObject& args,
                                            const McpServer::ToolsCallResultHandler& onResult)
     {
         LOGDA() << "Tools call: " << name;
