@@ -35,6 +35,7 @@
 #include "kddockwidgets/src/qtquick/ViewFactory.h"
 #include "kddockwidgets/src/qtquick/Platform.h"
 #include "kddockwidgets/src/qtquick/QmlConfig.h"
+#include "kddockwidgets/src/qtquick/views/View.h"
 
 #include "modularity/ioc.h"
 #include "ui/iuiengine.h"
@@ -42,6 +43,21 @@
 #include "muse_framework_config.h"
 
 namespace muse::dock {
+class HiddenRubberBand : public KDDockWidgets::QtQuick::View
+{
+public:
+    explicit HiddenRubberBand(QQuickItem* parent)
+        : KDDockWidgets::QtQuick::View(nullptr, KDDockWidgets::Core::ViewType::RubberBand, parent)
+    {
+        KDDockWidgets::QtQuick::View::setVisible(false);
+    }
+
+    void setVisible(bool) override
+    {
+        KDDockWidgets::QtQuick::View::setVisible(false);
+    }
+};
+
 class DockWidgetFactory : public KDDockWidgets::QtQuick::ViewFactory
 {
 public:
@@ -53,6 +69,11 @@ public:
                                  KDDockWidgets::Core::View* parent = nullptr) const override
     {
         return new DropController(classicIndicators, parent, m_iocContext);
+    }
+
+    KDDockWidgets::Core::View* createRubberBand(KDDockWidgets::Core::View* parent) const override
+    {
+        return new HiddenRubberBand(KDDockWidgets::QtQuick::asQQuickItem(parent));
     }
 
     KDDockWidgets::Core::View* createSeparator(KDDockWidgets::Core::Separator* controller,
