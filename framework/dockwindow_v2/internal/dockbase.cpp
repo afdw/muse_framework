@@ -728,23 +728,6 @@ void DockBase::applySizeConstraints()
         const QRect winRect(window->dragRect().topLeft(), winSize);
         window->view()->setGeometry(winRect);
     }
-
-    if (!group || !m_inited) {
-        return;
-    }
-
-    QSize currentSize = m_dockWidget->size();
-
-    //! NOTE: Initial size for all dock-widgets
-    //! See QWidgetAdapter_quick.cpp, QWidgetAdapter::QWidgetAdapter
-    static constexpr QSize INITIAL_DOCK_SIZE(800, 800);
-    if (currentSize == INITIAL_DOCK_SIZE) {
-        return;
-    }
-
-    if (sizeInRange(currentSize, minimumSize, maximumSize)) {
-        return;
-    }
 }
 
 void DockBase::syncLayoutItemMinSize()
