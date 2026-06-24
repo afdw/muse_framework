@@ -22,6 +22,9 @@
 
 #include "initialletternavigation.h"
 
+#include <QTimer>
+#include <QRegularExpression>
+
 #include "global/log.h"
 
 #include "navigationpanel.h"

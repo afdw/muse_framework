@@ -21,6 +21,8 @@
  */
 #include "multiinstancesdevmodel.h"
 
+#include <QVariantMap>
+
 using namespace muse::mi;
 
 MultiInstancesDevModel::MultiInstancesDevModel(QObject* parent)

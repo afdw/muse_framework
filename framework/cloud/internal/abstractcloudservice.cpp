@@ -29,6 +29,7 @@
 #include <QUrlQuery>
 #include <QHttpMultiPart>
 #include <QRandomGenerator>
+#include <QTimer>
 
 #include "clouderrors.h"
 #include "multiwindows/resourcelockguard.h"
