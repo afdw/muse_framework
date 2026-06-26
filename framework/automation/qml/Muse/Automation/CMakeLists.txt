@@ -23,11 +23,6 @@ muse_create_qml_module(muse_automation_qml ALIAS muse::automation_qml FOR muse_a
 qt_add_qml_module(muse_automation_qml
     URI Muse.Automation
     VERSION 1.0
-    SOURCES
-        automationoverlay.cpp
-        automationoverlay.h
-    QML_FILES
-        AutomationOverlayLoader.qml
     IMPORTS
         TARGET muse_ui_qml
         TARGET muse_uicomponents_qml
