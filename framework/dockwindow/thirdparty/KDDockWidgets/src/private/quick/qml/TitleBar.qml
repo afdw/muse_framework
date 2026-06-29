@@ -30,6 +30,7 @@ TitleBarBase {
     Text {
         id: title
         text: root.title
+        renderType: Text.NativeRendering
         anchors {
             left: parent ? parent.left : undefined
             leftMargin: 5

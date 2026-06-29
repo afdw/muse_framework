@@ -146,7 +146,7 @@ Style {
             elide: styleData.elideMode
             text: styleData.value !== undefined ? styleData.value.toString() : ""
             color: styleData.textColor
-            renderType: Settings.isMobile ? Text.QtRendering : Text.NativeRendering
+            renderType: Text.NativeRendering
         }
     }
 
