@@ -26,3 +26,7 @@ qt_add_qml_module(muse_legacytreeview_qml
 )
 
 fixup_qml_module_dependencies(muse_legacytreeview_qml)
+
+target_link_libraries(muse_legacytreeview_qml PRIVATE
+    muse::uicomponents_qml
+)

@@ -55,3 +55,8 @@ target_include_directories(muse_dockwindow_qml SYSTEM PRIVATE
     ${kddockwidgets_src_dir}/kddockwidgets/src/3rdparty
     ${kddockwidgets_src_dir}/kddockwidgets/src/3rdparty/nlohmann
 )
+
+target_link_libraries(muse_dockwindow_qml PRIVATE
+    muse::ui_qml
+    muse::uicomponents_qml
+)

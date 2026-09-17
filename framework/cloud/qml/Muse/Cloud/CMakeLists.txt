@@ -43,3 +43,8 @@ qt_add_qml_module(muse_cloud_qml
 )
 
 fixup_qml_module_dependencies(muse_cloud_qml)
+
+target_link_libraries(muse_cloud_qml PRIVATE
+    muse::ui_qml
+    muse::uicomponents_qml
+)

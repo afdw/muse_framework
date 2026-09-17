@@ -33,7 +33,7 @@ if (OS_IS_LIN)
     )
 endif()
 
-set(MODULE_TEST_LINK muse_draw)
+set(MODULE_TEST_LINK muse::draw)
 
 set(MODULE_TEST_INCLUDE
     ${MODULE_TEST_INCLUDE}

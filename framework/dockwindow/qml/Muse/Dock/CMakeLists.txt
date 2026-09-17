@@ -45,3 +45,8 @@ qt_add_qml_module(muse_dockwindow_qml
 fixup_qml_module_dependencies(muse_dockwindow_qml)
 
 target_link_libraries(muse_dockwindow_qml PRIVATE kddockwidgets)
+
+target_link_libraries(muse_dockwindow_qml PRIVATE
+    muse::ui_qml
+    muse::uicomponents_qml
+)

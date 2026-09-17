@@ -70,7 +70,7 @@ target_link_libraries(${MODULE_TEST}
     Qt6::Gui
     Qt6::Widgets
     Qt6::Test
-    muse_global
+    muse::global
     ${MODULE_TEST_LINK}
     ${COVERAGE_FLAGS}
     )

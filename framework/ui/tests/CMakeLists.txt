@@ -31,12 +31,12 @@ set(MODULE_TEST_SRC
     )
 
 set(MODULE_TEST_LINK
-    muse_rcommand
-    muse_actions
-    muse_ui
+    muse::rcommand
+    muse::actions
+    muse::ui
     # Linking a non-qml module (or its tests) to its qml counterpart should 
     # generally be avoided, but for the ui module we have to make an exception.
-    muse_ui_qml 
+    muse::ui_qml
     Qt::Quick
     )
 

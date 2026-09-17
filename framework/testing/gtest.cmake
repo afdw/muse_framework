@@ -79,7 +79,7 @@ target_link_libraries(${MODULE_TEST}
     Qt6::Core
     Qt6::Gui
     gmock
-    muse_global
+    muse::global
     ${MODULE_TEST_LINK}
     ${COVERAGE_FLAGS}
     )

@@ -32,3 +32,8 @@ qt_add_qml_module(muse_rcommand_qml
 )
 
 fixup_qml_module_dependencies(muse_rcommand_qml)
+
+target_link_libraries(muse_rcommand_qml PRIVATE
+    muse::ui_qml
+    muse::uicomponents_qml
+)

@@ -19,3 +19,8 @@ qt_add_qml_module(muse_midiremote_qml
 )
 
 fixup_qml_module_dependencies(muse_midiremote_qml)
+
+target_link_libraries(muse_midiremote_qml PRIVATE
+    muse::ui_qml
+    muse::uicomponents_qml
+)

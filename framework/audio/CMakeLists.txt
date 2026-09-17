@@ -38,7 +38,7 @@ add_subdirectory(main)
 add_subdirectory(engine)
 add_subdirectory(driver)
 
-target_link_libraries(muse_audio PRIVATE muse_audio_main muse_audio_engine muse_audio_driver)
+target_link_libraries(muse_audio PRIVATE muse::audio_main muse::audio_engine muse::audio_driver)
 
 if (MUSE_MODULE_AUDIO_TESTS)
     add_subdirectory(tests)

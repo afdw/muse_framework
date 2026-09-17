@@ -27,8 +27,8 @@ set(MODULE_TEST_SRC
     )
 
 set(MODULE_TEST_LINK
-    muse_ui
-    muse_accessibility
+    muse::ui
+    muse::accessibility
     )
 
 include(SetupGTest)

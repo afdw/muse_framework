@@ -31,7 +31,7 @@ set(MODULE_TEST_SRC
 
 set(MODULE_TEST_LINK
     Qt::Qml
-    muse_uicomponents_qml
+    muse::uicomponents_qml
     )
 
 include(SetupGTest)

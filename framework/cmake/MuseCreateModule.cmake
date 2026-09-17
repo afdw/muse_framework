@@ -128,7 +128,7 @@ function(muse_create_module target_name)
 
     # Link with global module
     if (NOT ${target_name} STREQUAL muse_global)
-        target_link_libraries(${target_name} PRIVATE muse_global)
+        target_link_libraries(${target_name} PRIVATE muse::global)
     endif()
 endfunction()
 

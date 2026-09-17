@@ -29,7 +29,7 @@ set(MODULE_TEST_SRC
 )
 
 set(MODULE_TEST_LINK
-    muse_update
+    muse::update
     Qt::Network
 )
 

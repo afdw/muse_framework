@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-muse_create_module(muse_audio_driver)
+muse_create_module(muse_audio_driver ALIAS muse::audio_driver)
 
 target_include_directories(muse_audio_driver PRIVATE ..)
 
@@ -101,4 +101,4 @@ elseif(OS_IS_WASM)
     )
 endif()
 
-target_link_libraries(muse_audio_driver PRIVATE muse_audio_common)
+target_link_libraries(muse_audio_driver PRIVATE muse::audio_common)

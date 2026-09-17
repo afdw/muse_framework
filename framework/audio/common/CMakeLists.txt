@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-muse_create_module(muse_audio_common)
+muse_create_module(muse_audio_common ALIAS muse::audio_common)
 
 target_include_directories(muse_audio_common PRIVATE ..)
 

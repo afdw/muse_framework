@@ -30,10 +30,10 @@ set(MODULE_TEST_INCLUDE
     )
 
 set(MODULE_TEST_LINK
-    muse_dockwindow
-    muse_dockwindow_qml
-    muse_ui_qml
-    muse_uicomponents_qml
+    muse::dockwindow
+    muse::dockwindow_qml
+    muse::ui_qml
+    muse::uicomponents_qml
     Qt::Quick
     )
 

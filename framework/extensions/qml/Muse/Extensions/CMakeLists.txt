@@ -58,3 +58,8 @@ fixup_qml_module_dependencies(muse_extensions_qml)
 
 # Necessary for the auto-generated sources
 target_include_directories(muse_extensions_qml PRIVATE devtools)
+
+target_link_libraries(muse_extensions_qml PRIVATE
+    muse::ui_qml
+    muse::uicomponents_qml
+)

@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-muse_create_module(muse_audio_engine)
+muse_create_module(muse_audio_engine ALIAS muse::audio_engine)
 
 target_include_directories(muse_audio_engine PRIVATE ..)
 
@@ -229,4 +229,4 @@ if (MUSE_MODULE_AUDIO_EXPORT)
     target_link_libraries(muse_audio_engine PRIVATE fdk-aac::fdk-aac)
 endif() # MUSE_MODULE_AUDIO_EXPORT
 
-target_link_libraries(muse_audio_engine PRIVATE muse_audio_common)
+target_link_libraries(muse_audio_engine PRIVATE muse::audio_common)

@@ -28,6 +28,6 @@ set(MODULE_TEST_SRC
     ${CMAKE_CURRENT_LIST_DIR}/mocks/articulationprofilesrepositorymock.h
     )
 
-set(MODULE_TEST_LINK muse_mpe)
+set(MODULE_TEST_LINK muse::mpe)
 
 include(SetupGTest)

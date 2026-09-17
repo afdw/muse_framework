@@ -25,7 +25,7 @@ set(MODULE_TEST_SRC
     )
 
 set(MODULE_TEST_LINK
-    muse_midi
+    muse::midi
 )
 
 include(SetupGTest)

@@ -45,3 +45,9 @@ target_link_libraries(muse_toast_qml PRIVATE muse::ui_qml muse::uicomponents_qml
 
 # Necessary for the auto-generated sources
 target_include_directories(muse_toast_qml PRIVATE dev)
+
+target_link_libraries(muse_toast_qml PRIVATE
+    Qt::Quick
+    muse::ui_qml
+    muse::uicomponents_qml
+)

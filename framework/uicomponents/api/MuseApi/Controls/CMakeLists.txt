@@ -112,3 +112,7 @@ qt_add_qml_module(muse_uicomponents_qmlapi
 )
 
 fixup_qml_module_dependencies(muse_uicomponents_qmlapi)
+
+target_link_libraries(muse_uicomponents_qmlapi PRIVATE
+    Qt::Quick
+)

@@ -25,7 +25,7 @@ set(MODULE_TEST_SRC
 )
 
 set(MODULE_TEST_LINK
-    muse_ui_qml
+    muse::ui_qml
     Qt::Quick
 )
 

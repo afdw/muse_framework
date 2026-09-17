@@ -25,6 +25,11 @@ qt_add_qml_module(muse_shortcuts_qml
 
 fixup_qml_module_dependencies(muse_shortcuts_qml)
 
+target_link_libraries(muse_shortcuts_qml PRIVATE
+    muse::ui_qml
+    muse::uicomponents_qml
+)
+
 if (OS_IS_MAC)
     find_library(CARBON_LIBRARY Carbon)
 

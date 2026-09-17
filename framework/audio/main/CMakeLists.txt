@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-muse_create_module(muse_audio_main)
+muse_create_module(muse_audio_main ALIAS muse::audio_main)
 
 target_include_directories(muse_audio_main PRIVATE ..)
 
@@ -67,4 +67,4 @@ else()
     )
 endif()
 
-target_link_libraries(muse_audio_main PRIVATE muse_audio_common)
+target_link_libraries(muse_audio_main PRIVATE muse::audio_common)

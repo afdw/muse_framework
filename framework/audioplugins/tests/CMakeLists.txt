@@ -40,6 +40,6 @@ set(MODULE_TEST_SRC
     ${CMAKE_CURRENT_LIST_DIR}/registeraudiopluginsscenariotest.cpp
 )
 
-set(MODULE_TEST_LINK muse_audioplugins)
+set(MODULE_TEST_LINK muse::audioplugins)
 
 include(SetupGTest)
