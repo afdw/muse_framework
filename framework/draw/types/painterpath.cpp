@@ -289,6 +289,25 @@ void PainterPath::arcTo(const RectF& rect, double startAngle, double sweepLength
 }
 
 #ifndef NO_QT_SUPPORT
+PainterPath PainterPath::fromQPainterPath(const QPainterPath& qpath) {
+    PainterPath path;
+
+    path.setDirty();
+    path.setFillRule(static_cast<FillRule>(qpath.fillRule()));
+
+    for (int i = 0; i < qpath.elementCount(); i++) {
+        auto elem = qpath.elementAt(i);
+
+        ElementType type = static_cast<ElementType>(elem.type);
+        double x = elem.x;
+        double y = elem.y;
+
+        path.m_elements.push_back({ x, y, type });
+    }
+
+    return path;
+}
+
 QPainterPath PainterPath::toQPainterPath(const PainterPath& path)
 {
     QPainterPath qpath;

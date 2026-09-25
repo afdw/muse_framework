@@ -129,6 +129,7 @@ public:
     void setFillRule(PainterPath::FillRule fillRule);
 
 #ifndef NO_QT_SUPPORT
+    static PainterPath fromQPainterPath(const QPainterPath& qpath);
     QPainterPath toQPainterPath() const { return toQPainterPath(*this); }
     static QPainterPath toQPainterPath(const PainterPath& path);
 #endif
