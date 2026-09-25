@@ -238,15 +238,26 @@ void QPainterProvider::drawPolygon(const PointF* points, size_t pointCount, Poly
 
 void QPainterProvider::drawText(const PointF& point, const String& text)
 {
-    QPointF p = point.toQPointF();
-    QString t = text.toQString();
-    m_painter->drawText(p, t);
+    if (m_pen.style() == PenStyle::NoPen) {
+        m_painter->save();
+        m_painter->setPen(QPen(Brush::toQBrush(m_brush), 0.0));
+        m_painter->drawText(point.toQPointF(), text.toQString());
+        m_painter->restore();
+    } else {
+        QPainterPath path;
+        path.addText(point.toQPointF(), m_painter->font(), text);
+        m_painter->drawPath(path);
+    }
 }
 
 void QPainterProvider::drawText(const RectF& rect, Alignment alignment, TextFlags textFlags, const String& text)
 {
     int flags = static_cast<int>(alignment) | static_cast<int>(textFlags);
+    // Stroke is not supported for this version…
+    m_painter->save();
+    m_painter->setPen(QPen(Brush::toQBrush(m_brush), 0.0));
     m_painter->drawText(rect.toQRectF(), flags, text.toQString());
+    m_painter->restore();
 }
 
 void QPainterProvider::drawSymbol(const PointF& point, char32_t ucs4Code)
